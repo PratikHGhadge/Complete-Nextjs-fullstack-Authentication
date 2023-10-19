@@ -1,14 +1,25 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { Axios } from "axios";
+import axios from "axios";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 export default function LoginPage() {
+  const router = useRouter();
   const [user, setUser] = React.useState({
     email: "",
     password: "",
-    username: "",
   });
+  const handelLogin = async (e: any) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("api/users/login", user);
+      toast.success("user logged in successfully");
+      // router.push("/home");
+    } catch (error) {
+      toast.error("login failed");
+    }
+  };
   return (
     <>
       <div className=" ">
@@ -35,7 +46,7 @@ export default function LoginPage() {
                   value={user.email}
                   onChange={(e) => setUser({ ...user, email: e.target.value })}
                   placeholder="password"
-                  className="appearance-none block  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                  className="appearance-none block text-black  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -57,16 +68,18 @@ export default function LoginPage() {
                     setUser({ ...user, password: e.target.value });
                   }}
                   placeholder="username"
-                  className="appearance-none block  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                  className="appearance-none block  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm text-black"
                 />
               </div>
             </div>
             <button
               type="submit"
-              className="w-full mt-5 bg-black flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black-600 hover:bg-black "
+              onClick={(e) => handelLogin(e)}
+              className="w-full mt-5 bg-black flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black-600 hover:bg-black text-black"
             >
               Submit
             </button>
+            <Toaster position="top-right" reverseOrder={false} />
             <p className="mt-4 text-center text-sm text-gray-600">
               Not registerd yet ?{" "}
               <Link

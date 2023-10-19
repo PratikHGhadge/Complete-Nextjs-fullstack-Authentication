@@ -1,15 +1,44 @@
 "use client";
 import Link from "next/link";
-import React from "react";
-import { Axios } from "axios";
+import React, { useEffect } from "react";
+import axios from "axios";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 export default function SignupPage() {
   const [user, setUser] = React.useState({
     email: "",
     password: "",
     username: "",
   });
-  const onSignup = async () => {};
+  const [buttonDisabled, setButtonDisabled] = React.useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = React.useState(false);
+
+  useEffect(() => {
+    if (
+      user.email.length > 0 &&
+      user.password.length > 0 &&
+      user.username.length > 0
+    ) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
+
+  const onSignup = async (e: any) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const response = await axios.post("api/users/signup", user);
+      toast.success("Sign Up Successfully");
+      router.push("/login");
+    } catch (error: any) {
+      toast.error("something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <>
       <div className=" ">
@@ -17,7 +46,7 @@ export default function SignupPage() {
           <form className=" shadow-xl  px-4 py-8 rounded-lg bg-white mt-20">
             <div className="text-center mb-6">
               <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-                Sign Up
+                {loading ? "Processing" : "Signup"}
               </h2>
             </div>
             <div>
@@ -37,7 +66,8 @@ export default function SignupPage() {
                   onChange={(e) =>
                     setUser({ ...user, username: e.target.value })
                   }
-                  className="appearance-none block  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                  placeholder="username"
+                  className="appearance-none block   w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm text-black"
                 />
               </div>
             </div>
@@ -56,8 +86,8 @@ export default function SignupPage() {
                   type="email"
                   value={user.email}
                   onChange={(e) => setUser({ ...user, email: e.target.value })}
-                  placeholder="password"
-                  className="appearance-none block  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                  placeholder="email"
+                  className="appearance-none block  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm text-black"
                 />
               </div>
             </div>
@@ -78,17 +108,19 @@ export default function SignupPage() {
                   onChange={(e) => {
                     setUser({ ...user, password: e.target.value });
                   }}
-                  placeholder="username"
-                  className="appearance-none block  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm"
+                  placeholder="password"
+                  className="appearance-none block  w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm text-black"
                 />
               </div>
             </div>
             <button
               type="submit"
+              onClick={(e) => onSignup(e)}
               className="w-full mt-5 bg-black flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black-600 hover:bg-black "
             >
-              Submit
+              {buttonDisabled ? "No SignUp" : "SignUp"}
             </button>
+            <Toaster position="top-right" reverseOrder={false} />
             <p className="mt-4 text-center text-sm text-gray-600">
               Not registerd yet ?{" "}
               <Link
